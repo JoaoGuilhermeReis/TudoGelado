@@ -151,6 +151,31 @@
       .cart-sidebar { width: 100%; right: -100%; }
       .social-buttons { flex-direction: column; }
     }
+    /* --- Estilo do Seletor de Pagamento (Novo) --- */
+    .cart-payment {
+      margin-bottom: 20px;
+    }
+    .cart-payment label {
+      display: block;
+      color: #e0f2fe;
+      margin-bottom: 8px;
+      font-size: 0.9rem;
+    }
+    .payment-select {
+      width: 100%;
+      padding: 10px;
+      background: rgba(2, 6, 23, 0.5);
+      border: 1px solid var(--primary);
+      color: white;
+      border-radius: 10px;
+      outline: none;
+      font-family: 'Poppins', sans-serif;
+      cursor: pointer;
+    }
+    .payment-select option {
+      background: #0f172a; /* Fundo escuro para as opções */
+      color: white;
+    }
   </style>
 </head>
 <body>
@@ -177,7 +202,18 @@
     <div class="cart-items-container">
       <p style="text-align: center; color: var(--text-muted); margin-top: 50px;">Seu carrinho está vazio.</p>
     </div>
+    
     <div style="border-top: 1px solid rgba(255,255,255,0.1); padding-top: 20px;">
+      
+      <div class="cart-payment">
+        <label><i class="fa-regular fa-credit-card"></i> Forma de Pagamento:</label>
+        <select id="payment-method" class="payment-select">
+          <option value="Pix">Pix (Envie a chave)</option>
+          <option value="Cartão de Crédito">Cartão de Crédito</option>
+          <option value="Cartão de Débito">Cartão de Débito</option>
+          <option value="Dinheiro">Dinheiro (Informar troco)</option>
+        </select>
+      </div>
       <div style="display: flex; justify-content: space-between; font-size: 1.2rem; font-weight: 700; margin-bottom: 20px;">
         <span>Total:</span>
         <span id="cart-total">R$ 0,00</span>
@@ -343,10 +379,28 @@
 
     function checkoutWhatsApp() {
         if(cart.length === 0) return showToast("Carrinho vazio!");
-        let msg = "Olá! Gostaria de fazer o pedido:\n\n";
+
+        // Pega o valor selecionado no menu
+        const paymentMethod = document.getElementById('payment-method').value;
+
+        let msg = "Olá, Tudo Gelado! Gostaria de fazer o seguinte pedido:\n\n";
         let total = 0;
-        cart.forEach(i => { msg += `▪️ *${i.quantity}x ${i.name}*\n`; total += i.price * i.quantity; });
-        msg += `\n*Total: R$ ${total.toFixed(2).replace('.',',')}*\n\nInforme a taxa de entrega.`;
+        
+        cart.forEach(i => { 
+            msg += `▪️ *${i.quantity}x ${i.name}* (R$ ${(i.price * i.quantity).toFixed(2).replace('.',',')})\n`; 
+            total += i.price * i.quantity; 
+        });
+
+        msg += `\n*Total Produtos: R$ ${total.toFixed(2).replace('.',',')}*`;
+        msg += `\n💳 *Pagamento:* ${paymentMethod}\n`; // Adiciona o pagamento na mensagem
+        
+        // Se for dinheiro, adiciona lembrete de troco
+        if(paymentMethod.includes("Dinheiro")) {
+            msg += `\n(Se precisar de troco, por favor me informe o valor aqui)`;
+        }
+
+        msg += `\n\nPor favor, calcule a taxa de entrega para o meu endereço.`;
+
         window.open(`https://wa.me/557981169223?text=${encodeURIComponent(msg)}`, '_blank');
     }
 
