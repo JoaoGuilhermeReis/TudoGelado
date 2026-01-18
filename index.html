@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Tudo Gelado | Sobremesas Artesanais</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Sobremesas geladas artesanais em Aracaju. Encomende tortas e doces via WhatsApp.">
+  
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --primary: #38bdf8;
+      --secondary: #22c55e;
+      --accent: #f59e0b;
+      --dark-bg: #0f172a;
+      --card-bg: rgba(30, 41, 59, 0.7);
+      --glass-border: 1px solid rgba(255, 255, 255, 0.1);
+      --text-light: #f8fafc;
+      --text-muted: #94a3b8;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; scroll-behavior: smooth; }
+
+    body {
+      background-color: var(--dark-bg);
+      background-image: radial-gradient(circle at 50% 0%, #1e293b 0%, #020617 100%);
+      color: var(--text-light);
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
+
+    /* --- ANIMAÇÃO DE SCROLL (A Mágica acontece aqui) --- */
+    .hidden {
+      opacity: 0;
+      filter: blur(5px);
+      transform: translateY(80px); /* Elemento começa 80px para baixo */
+      transition: all 1s ease; /* Demora 1s para subir suavemente */
+    }
+
+    .show {
+      opacity: 1;
+      filter: blur(0);
+      transform: translateY(0); /* Vai para o lugar original */
+    }
+
+    /* Atraso para os cards aparecerem um por um */
+    .products .card:nth-child(2) { transition-delay: 200ms; }
+    .products .card:nth-child(3) { transition-delay: 400ms; }
+    .products .card:nth-child(4) { transition-delay: 600ms; }
+
+    /* --- Navbar --- */
+    nav {
+      position: fixed; top: 0; width: 100%; padding: 0 5%;
+      display: flex; justify-content: space-between; align-items: center;
+      background: rgba(15, 23, 42, 0.95); backdrop-filter: blur(10px);
+      z-index: 1000; border-bottom: var(--glass-border);
+      height: 90px;
+    }
+
+    /* Ajuste da Logo Grande */
+    .nav-logo { display: flex; align-items: center; height: 100%; padding: 10px 0; }
+    .nav-logo img {
+      height: 100%;
+      max-height: 70px; /* Impede que a logo estoure a barra */
+      width: auto;
+      object-fit: contain;
+      transition: transform 0.3s ease;
+    }
+    .nav-logo:hover img { transform: scale(1.05); }
+
+    .nav-icons { display: flex; align-items: center; gap: 20px; }
+    .cart-icon-container { position: relative; cursor: pointer; font-size: 1.4rem; color: var(--text-light); transition: color 0.3s; }
+    .cart-icon-container:hover { color: var(--primary); }
+    .cart-count { position: absolute; top: -8px; right: -10px; background-color: var(--secondary); color: #020617; font-size: 0.75rem; font-weight: bold; width: 18px; height: 18px; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
+
+    /* --- Hero --- */
+    header {
+      padding: 180px 20px 120px; text-align: center;
+      background: url('https://images.unsplash.com/photo-1488477181946-6428a0291777?q=80&w=2887&auto=format&fit=crop') no-repeat center center/cover;
+      position: relative;
+    }
+    header::before { content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: linear-gradient(to bottom, rgba(2,6,23,0.7), var(--dark-bg)); }
+    .hero-content { position: relative; z-index: 1; max-width: 800px; margin: 0 auto; }
+    header h1 { font-size: 3.5rem; margin-bottom: 15px; background: linear-gradient(to right, #e0f2fe, var(--primary)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-weight: 800; line-height: 1.2; }
+    header p { font-size: 1.3rem; color: #cbd5e1; margin-bottom: 35px; }
+
+    /* --- Botões --- */
+    .btn { display: inline-flex; align-items: center; gap: 10px; padding: 12px 30px; border-radius: 50px; text-decoration: none; font-weight: 600; transition: all 0.3s ease; cursor: pointer; border: none; font-size: 1rem; }
+    .btn-primary { background: var(--secondary); color: #020617; box-shadow: 0 0 20px rgba(34, 197, 94, 0.3); }
+    .btn-primary:hover { transform: translateY(-3px); box-shadow: 0 0 30px rgba(34, 197, 94, 0.5); background: #4ade80; }
+
+    section { padding: 80px 20px; max-width: 1200px; margin: auto; }
+    section h2 { text-align: center; font-size: 2.5rem; margin-bottom: 10px; color: var(--text-light); }
+    .subtitle { text-align: center; color: var(--text-muted); margin-bottom: 50px; font-size: 1.1rem; }
+
+    /* --- Quem Somos --- */
+    .about-section { display: flex; align-items: center; gap: 40px; }
+    .about-img { flex: 1; border-radius: 24px; overflow: hidden; box-shadow: 0 20px 40px rgba(0,0,0,0.3); }
+    .about-img img { width: 100%; height: auto; display: block; }
+    .about-text { flex: 1; }
+    .about-text h2 { text-align: left; }
+
+    /* --- Produtos --- */
+    .products { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 40px; }
+    .card { background: var(--card-bg); border-radius: 24px; overflow: hidden; border: var(--glass-border); transition: transform 0.4s ease, box-shadow 0.4s ease; position: relative; display: flex; flex-direction: column; }
+    .card:hover { transform: translateY(-10px); box-shadow: 0 20px 40px rgba(0,0,0,0.4); border-color: rgba(56, 189, 248, 0.3); }
+    .status-tag { position: absolute; top: 15px; right: 15px; padding: 5px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; z-index: 10; }
+    .status-ready { background: var(--secondary); color: #020617; }
+    .status-order { background: var(--accent); color: #020617; }
+    .card-img-wrapper { overflow: hidden; height: 250px; }
+    .card img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s ease; }
+    .card:hover img { transform: scale(1.1); }
+    .card-content { padding: 25px; display: flex; flex-direction: column; flex-grow: 1; }
+    .card-content h3 { font-size: 1.4rem; margin-bottom: 8px; color: #e0f2fe; }
+    .card-footer { display: flex; justify-content: space-between; align-items: center; margin-top: auto; }
+    .price-tag { font-size: 1.3rem; font-weight: 700; color: var(--primary); }
+    .btn-add-cart { background: transparent; border: 2px solid var(--primary); color: var(--primary); padding: 8px 16px; border-radius: 12px; cursor: pointer; font-weight: 600; transition: all 0.3s; }
+    .btn-add-cart:hover { background: var(--primary); color: #020617; }
+
+    /* --- REDES SOCIAIS --- */
+    .social-section { text-align: center; background: rgba(255, 255, 255, 0.03); border-radius: 30px; margin: 40px auto; padding: 60px 20px; border: var(--glass-border); }
+    .social-buttons { display: flex; justify-content: center; gap: 20px; flex-wrap: wrap; margin-top: 30px; }
+    .social-btn { display: flex; align-items: center; gap: 10px; padding: 15px 35px; border-radius: 50px; text-decoration: none; font-weight: 600; font-size: 1.1rem; color: white; transition: transform 0.3s ease; }
+    .social-btn:hover { transform: scale(1.05); }
+    .instagram { background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%); box-shadow: 0 4px 15px rgba(220, 39, 67, 0.4); }
+    .tiktok { background: #000000; border: 1px solid #333; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4); }
+    .tiktok i { color: #00f2ea; text-shadow: 2px 2px 0px #ff0050; }
+
+    /* --- Footer & Infos --- */
+    .info-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 30px; text-align: center; }
+    .info-box i { font-size: 2rem; color: var(--accent); margin-bottom: 15px; }
+    footer { background: #020617; text-align: center; padding: 40px 20px; border-top: var(--glass-border); color: #64748b; font-size: 0.9rem; }
+
+    /* --- Carrinho Sidebar --- */
+    .cart-sidebar { position: fixed; top: 0; right: -400px; width: 350px; height: 100%; background: rgba(15, 23, 42, 0.98); backdrop-filter: blur(15px); z-index: 2000; padding: 25px; display: flex; flex-direction: column; transition: right 0.4s ease-in-out; border-left: var(--glass-border); box-shadow: -5px 0 30px rgba(0,0,0,0.5); }
+    .cart-sidebar.active { right: 0; }
+    .cart-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 15px; }
+    .cart-items-container { flex-grow: 1; overflow-y: auto; }
+    .cart-item { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 10px; }
+    .cart-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 1900; display: none; }
+    .cart-overlay.active { display: block; }
+    .toast { position: fixed; bottom: 25px; left: 50%; transform: translateX(-50%); background: var(--secondary); color: #020617; padding: 12px 24px; border-radius: 30px; font-weight: 600; z-index: 3000; opacity: 0; visibility: hidden; transition: all 0.3s ease; }
+    .toast.show { opacity: 1; visibility: visible; bottom: 40px; }
+    .whatsapp-float { position: fixed; bottom: 25px; right: 25px; background-color: #25d366; color: #fff; width: 60px; height: 60px; border-radius: 50%; text-align: center; font-size: 30px; box-shadow: 0px 4px 15px rgba(0,0,0,0.4); z-index: 990; display: flex; align-items: center; justify-content: center; transition: transform 0.3s; text-decoration: none; }
+
+    @media (max-width: 768px) {
+      header h1 { font-size: 2.8rem; }
+      .about-section { flex-direction: column; }
+      .cart-sidebar { width: 100%; right: -100%; }
+      .social-buttons { flex-direction: column; }
+    }
+  </style>
+</head>
+<body>
+
+  <nav>
+    <a href="#" class="nav-logo">
+      <img src="ChatGPT Image 18 de jan. de 2026, 19_26_44 (1).png" alt="Logo Tudo Gelado">
+    </a>
+
+    <div class="nav-icons">
+      <div class="cart-icon-container" id="cart-btn">
+        <i class="fa-solid fa-cart-shopping"></i>
+        <span class="cart-count">0</span>
+      </div>
+    </div>
+  </nav>
+
+  <div class="cart-overlay"></div>
+  <div class="cart-sidebar">
+    <div class="cart-header">
+      <h3>Seu Pedido</h3>
+      <span style="cursor: pointer; font-size: 1.5rem;" onclick="closeCart()"><i class="fa-solid fa-xmark"></i></span>
+    </div>
+    <div class="cart-items-container">
+      <p style="text-align: center; color: var(--text-muted); margin-top: 50px;">Seu carrinho está vazio.</p>
+    </div>
+    <div style="border-top: 1px solid rgba(255,255,255,0.1); padding-top: 20px;">
+      <div style="display: flex; justify-content: space-between; font-size: 1.2rem; font-weight: 700; margin-bottom: 20px;">
+        <span>Total:</span>
+        <span id="cart-total">R$ 0,00</span>
+      </div>
+      <button class="btn btn-primary" style="width: 100%; justify-content: center;" onclick="checkoutWhatsApp()">
+        <i class="fa-brands fa-whatsapp"></i> Finalizar Pedido
+      </button>
+    </div>
+  </div>
+
+  <header>
+    <div class="hero-content hidden">
+      <h1>Felicidade em<br>Forma Gelada.</h1>
+      <p>Sobremesas artesanais premium. O equilíbrio perfeito entre textura, sabor e refrescância.</p>
+      <a class="btn btn-primary" href="#cardapio">
+        <i class="fa-solid fa-utensils"></i> Ver Cardápio
+      </a>
+    </div>
+  </header>
+
+  <section class="about-section hidden" id="sobre">
+    <div class="about-img">
+      <img src="Captura de tela_18-1-2026_19394_www.instagram.com.jpeg" alt="Nossa cozinha">
+    </div>
+    <div class="about-text">
+      <h2>Feito à mão, com paixão.</h2>
+      <p>A Tudo Gelado nasceu na cozinha da nossa família. Usamos apenas frutas selecionadas, laticínios frescos e zero conservantes industriais.</p>
+      <a href="#cardapio" style="color: var(--primary); text-decoration: none; font-weight: 600;">Conheça nossos sabores <i class="fa-solid fa-arrow-right"></i></a>
+    </div>
+  </section>
+
+  <section id="cardapio">
+    <h2 class="hidden">Nosso Cardápio</h2>
+    <p class="subtitle hidden">Clique em "Adicionar" para montar seu pedido</p>
+
+    <div class="products">
+      <div class="card hidden">
+        <span class="status-tag status-ready">Pronta Entrega</span>
+        <div class="card-img-wrapper">
+          <img src="https://images.unsplash.com/photo-1519915028121-7d3463d20b13?q=80&w=1000&auto=format&fit=crop" alt="Torta Limão">
+        </div>
+        <div class="card-content">
+          <h3>Torta Mousse de Limão</h3>
+          <p>Base de biscoito crocante, mousse aerado de limão taiti e raspas frescas.</p>
+          <div class="card-footer">
+            <span class="price-tag">R$ 55,00</span>
+            <button class="btn-add-cart" onclick="addToCart('Torta Mousse de Limão', 55.00)">Add</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="card hidden">
+        <span class="status-tag status-order">Sob Encomenda</span>
+        <div class="card-img-wrapper">
+          <img src="https://www.thespruceeats.com/thmb/BIwbw4NFK2IWnIE1UOUyiNj9u94=/750x0/filters:no_upscale():max_bytes(150000):strip_icc():format(webp)/gluten-free-new-york-cheesecake-1450985-hero-01-dc54f9daf38044238b495c7cefc191fa.jpg" alt="Cheesecake">
+        </div>
+        <div class="card-content">
+          <h3>Cheesecake Frutas Vermelhas</h3>
+          <p>Cremoso e denso, coberto com geleia artesanal de morango e mirtilo.</p>
+          <div class="card-footer">
+            <span class="price-tag">R$ 65,00</span>
+            <button class="btn-add-cart" onclick="addToCart('Cheesecake Frutas Vermelhas', 65.00)">Add</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="card hidden">
+        <span class="status-tag status-ready">Pronta Entrega</span>
+        <div class="card-img-wrapper">
+          <img src="https://images.unsplash.com/photo-1606890737304-57a1ca8a5b62?q=80&w=2003&auto=format&fit=crop" alt="Bolo Coco">
+        </div>
+        <div class="card-content">
+          <h3>Bolo Gelado de Coco</h3>
+          <p>Massa molhadinha no leite de coco e coberta com flocos. Sabor de infância.</p>
+          <div class="card-footer">
+            <span class="price-tag">R$ 14,00</span>
+            <button class="btn-add-cart" onclick="addToCart('Fatia Bolo de Coco', 14.00)">Add</button>
+          </div>
+        </div>
+      </div>
+
+       <div class="card hidden">
+        <span class="status-tag status-order">Edição Limitada</span>
+        <div class="card-img-wrapper">
+          <img src="https://receitatodahora.com.br/wp-content/uploads/2022/10/banoffee-perfeita-1024x682.jpg.webp" alt="Banoffee">
+        </div>
+        <div class="card-content">
+          <h3>Torta Banoffee</h3>
+          <p>Camadas de banana fresca, doce de leite caseiro e chantilly.</p>
+          <div class="card-footer">
+            <span class="price-tag">R$ 50,00</span>
+            <button class="btn-add-cart" onclick="addToCart('Torta Banoffee', 50.00)">Add</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="social-section hidden">
+    <h2>Siga a gente!</h2>
+    <p class="subtitle">Acompanhe bastidores e promoções.</p>
+    
+    <div class="social-buttons">
+      <a href="https://www.instagram.com/fernandasidy/" target="_blank" class="social-btn instagram">
+        <i class="fa-brands fa-instagram"></i> Instagram
+      </a>
+
+      <a href="https://tiktok.com/@SEU_USUARIO" target="_blank" class="social-btn tiktok">
+        <i class="fa-brands fa-tiktok"></i> TikTok
+      </a>
+    </div>
+  </section>
+
+  <section class="hidden">
+    <div class="info-grid">
+      <div class="info-box"><i class="fa-solid fa-motorcycle"></i><h3>Entrega em Aracaju</h3><p>Consulte a taxa.</p></div>
+      <div class="info-box"><i class="fa-solid fa-credit-card"></i><h3>Pagamento Fácil</h3><p>Pix ou Cartão.</p></div>
+      <div class="info-box"><i class="fa-regular fa-clock"></i><h3>Terça a Domingo</h3><p>Das 13h às 20h.</p></div>
+    </div>
+  </section>
+
+  <footer>
+    <p>© 2026 Tudo Gelado. Todos os direitos reservados.</p>
+    <p style="opacity: 0.5; font-size: 0.8rem;">Aracaju, SE</p>
+  </footer>
+
+  <a href="https://wa.me/+557981169223?text=Olá! Tenho uma dúvida." class="whatsapp-float" target="_blank"><i class="fa-brands fa-whatsapp"></i></a>
+  <div id="toast-box" class="toast">Item adicionado!</div>
+
+<script>
+    /* 1. Lógica do Carrinho */
+    let cart = [];
+    const cartSidebar = document.querySelector('.cart-sidebar');
+    const cartOverlay = document.querySelector('.cart-overlay');
+    const toastBox = document.getElementById('toast-box');
+
+    document.getElementById('cart-btn').addEventListener('click', () => { cartSidebar.classList.add('active'); cartOverlay.classList.add('active'); });
+    const closeCart = () => { cartSidebar.classList.remove('active'); cartOverlay.classList.remove('active'); };
+    document.querySelector('.cart-overlay').addEventListener('click', closeCart);
+
+    function showToast(msg) { toastBox.textContent = msg; toastBox.classList.add('show'); setTimeout(() => toastBox.classList.remove('show'), 3000); }
+
+    function addToCart(name, price) {
+        let item = cart.find(i => i.name === name);
+        if(item) item.quantity++; else cart.push({name, price, quantity: 1});
+        updateCartUI(); showToast(`${name} adicionado!`); cartSidebar.classList.add('active'); cartOverlay.classList.add('active');
+    }
+
+    function removeFromCart(name) { cart = cart.filter(i => i.name !== name); updateCartUI(); }
+
+    function updateCartUI() {
+        document.querySelector('.cart-count').textContent = cart.reduce((sum, i) => sum + i.quantity, 0);
+        const container = document.querySelector('.cart-items-container');
+        container.innerHTML = '';
+        let total = 0;
+        if(cart.length === 0) { container.innerHTML = '<p style="text-align: center; color: var(--text-muted); margin-top: 50px;">Seu carrinho está vazio.</p>'; }
+        cart.forEach(i => {
+            total += i.price * i.quantity;
+            container.innerHTML += `<div class="cart-item"><div><h4>${i.quantity}x ${i.name}</h4><span style="color:var(--primary)">R$ ${(i.price*i.quantity).toFixed(2).replace('.',',')}</span></div><i class="fa-solid fa-trash" style="color:#ef4444;cursor:pointer" onclick="removeFromCart('${i.name}')"></i></div>`;
+        });
+        document.getElementById('cart-total').textContent = `R$ ${total.toFixed(2).replace('.',',')}`;
+    }
+
+    function checkoutWhatsApp() {
+        if(cart.length === 0) return showToast("Carrinho vazio!");
+        let msg = "Olá! Gostaria de fazer o pedido:\n\n";
+        let total = 0;
+        cart.forEach(i => { msg += `▪️ *${i.quantity}x ${i.name}*\n`; total += i.price * i.quantity; });
+        msg += `\n*Total: R$ ${total.toFixed(2).replace('.',',')}*\n\nInforme a taxa de entrega.`;
+        window.open(`https://wa.me/557981169223?text=${encodeURIComponent(msg)}`, '_blank');
+    }
+
+    /* 2. Lógica da Animação de Scroll (Restauração) */
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if(entry.isIntersecting) {
+                entry.target.classList.add('show');
+            }
+        });
+    });
+
+    // Procura todos os elementos com a classe 'hidden' e os observa
+    document.querySelectorAll('.hidden').forEach(el => observer.observe(el));
+</script>
+
+</body>
+</html>
